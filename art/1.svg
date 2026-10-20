@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600" role="img" aria-label="Blushing doodle face with a shy smile">
+  <rect width="600" height="600" fill="#fff8f1"/>
+
+  <!-- head -->
+  <path d="M300 72c100 0 164 64 164 166 0 76-36 138-88 168-24 14-50 21-76 21s-52-7-76-21c-52-30-88-92-88-168C136 136 200 72 300 72Z"
+        fill="#fff" stroke="#241d1a" stroke-width="9" stroke-linejoin="round"/>
+
+  <!-- blush (above the face, below the outline) -->
+  <g fill="#ff9fb2" opacity=".55">
+    <ellipse cx="196" cy="318" rx="46" ry="25"/>
+    <ellipse cx="404" cy="318" rx="46" ry="25"/>
+  </g>
+  <g stroke="#ff6b8d" stroke-width="4.5" stroke-linecap="round" opacity=".55">
+    <path d="M174 308l14 20M192 304l14 20M210 302l14 20"/>
+    <path d="M382 302l14 20M400 304l14 20M418 308l14 20"/>
+  </g>
+
+  <!-- eyes -->
+  <g fill="#241d1a">
+    <ellipse cx="238" cy="256" rx="43" ry="35" transform="rotate(-10 238 256)"/>
+    <ellipse cx="362" cy="256" rx="43" ry="35" transform="rotate(10 362 256)"/>
+  </g>
+  <g fill="#fff">
+    <ellipse cx="226" cy="246" rx="12" ry="9" transform="rotate(-20 226 246)"/>
+    <ellipse cx="350" cy="246" rx="12" ry="9" transform="rotate(20 350 246)"/>
+  </g>
+
+  <!-- shy smile -->
+  <g fill="none" stroke="#241d1a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M272 340c9 15 21 15 28 3 7 12 19 12 28-3"/>
+  </g>
+
+  <!-- little sparkles -->
+  <g stroke="#ff7d98" stroke-width="6" stroke-linecap="round" fill="none">
+    <path d="M118 214l4 20M108 224l24 0"/>
+    <path d="M482 262l4 18M472 271l22 0"/>
+  </g>
+  <g fill="#ffb0c0">
+    <path d="M486 362c0-9 12-9 12 0 0-9 12-9 12 0 0 9-12 16-12 16s-12-7-12-16Z"/>
+    <path d="M92 330c0-7 9-7 9 0 0-7 9-7 9 0 0 7-9 12-9 12s-9-5-9-12Z"/>
+  </g>
+</svg>

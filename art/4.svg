@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600" role="img" aria-label="Doodle cat sweeping with a broom">
+  <rect width="600" height="600" fill="#fff8f1"/>
+
+  <!-- speech bubble -->
+  <g stroke="#241d1a" stroke-width="7" stroke-linejoin="round">
+    <path fill="#fff" d="M330 96c0-18 16-30 76-30s76 12 76 30v34c0 18-16 28-76 28-8 0-16 0-24-2l-28 20 4-24c-16-4-28-12-28-22Z"/>
+  </g>
+  <text x="406" y="132" text-anchor="middle" font-family="Gaegu, 'Comic Sans MS', cursive" font-size="30" font-weight="700" fill="#241d1a">wush</text>
+  <text x="406" y="166" text-anchor="middle" font-family="Gaegu, 'Comic Sans MS', cursive" font-size="30" font-weight="700" fill="#241d1a">wush</text>
+
+  <!-- cat -->
+  <g fill="#fff" stroke="#241d1a" stroke-width="8" stroke-linejoin="round" stroke-linecap="round">
+    <!-- ears + head -->
+    <path d="M228 214l-16-70 70 34Z"/>
+    <path d="M372 214l16-70-70 34Z"/>
+    <ellipse cx="300" cy="266" rx="106" ry="94"/>
+    <!-- body -->
+    <path d="M242 330c-26 24-38 62-34 100 26 24 58 34 92 34s66-10 92-34c4-38-8-76-34-100"/>
+    <!-- paws -->
+    <path d="M212 462c-4 22 8 34 28 34" fill="none"/>
+    <path d="M388 462c4 22-8 34-28 34" fill="none"/>
+  </g>
+
+  <!-- face -->
+  <g stroke="#241d1a" stroke-width="7" stroke-linecap="round">
+    <path d="M262 258c6-10 18-10 24 0" fill="none"/>
+    <path d="M314 258c6-10 18-10 24 0" fill="none"/>
+    <path d="M292 286l8 8 8-8" fill="none"/>
+    <path d="M282 306c8 8 28 8 36 0" fill="none"/>
+    <path d="M196 276h44M196 296h44" fill="none"/>
+    <path d="M404 276h-44M404 296h-44" fill="none"/>
+  </g>
+  <g fill="#ff9fb2" opacity=".5">
+    <ellipse cx="240" cy="296" rx="18" ry="10"/>
+    <ellipse cx="360" cy="296" rx="18" ry="10"/>
+  </g>
+
+  <!-- broom -->
+  <g stroke="#241d1a" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M236 372l128 132" fill="none"/>
+    <path d="M336 478l64 44-48 14-52-36Z" fill="#e8cfae"/>
+    <path d="M352 522l-2 26M368 528l-2 28M384 534l-4 26M336 512l-8 24" fill="none" stroke-width="7"/>
+  </g>
+
+  <!-- dust -->
+  <g fill="none" stroke="#241d1a" stroke-width="6" stroke-linecap="round">
+    <path d="M420 508c10-6 22-4 26 6"/>
+    <path d="M446 540c10-8 24-4 26 8"/>
+    <path d="M420 566c10-6 22-2 24 8"/>
+  </g>
+
+  <!-- tiny cat in the dust -->
+  <g fill="#fff" stroke="#241d1a" stroke-width="5" stroke-linejoin="round">
+    <path d="M470 560l-4-18 18 8Z"/>
+    <path d="M500 558l6-16-16 6Z"/>
+    <ellipse cx="484" cy="570" rx="24" ry="20"/>
+    <path d="M474 600c0 8 20 8 20 0" fill="none"/>
+  </g>
+
+  <!-- motion sparkles -->
+  <g stroke="#ff7d98" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M120 180l-4 22M104 196l18 8M136 194l-6 20"/>
+    <path d="M150 470l-10 18M136 480l20 6"/>
+  </g>
+</svg>

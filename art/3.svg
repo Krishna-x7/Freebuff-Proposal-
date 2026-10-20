@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600" role="img" aria-label="Doodle chef flipping a flaming pan">
+  <rect width="600" height="600" fill="#fff8f1"/>
+  <rect x="26" y="26" width="548" height="548" rx="20" fill="none" stroke="#241d1a" stroke-width="9"/>
+
+  <!-- stove -->
+  <path d="M62 470h140v46H62z" fill="#5a4a43" stroke="#241d1a" stroke-width="8" stroke-linejoin="round"/>
+
+  <!-- flame -->
+  <path d="M132 468c-38-14-52-48-40-78 6 20 18 26 24 22-10-34 8-60 24-70-8 24 2 34 12 30-2-26 12-40 24-44-4 22 6 30 14 26 0 26 14 34 20 22 12 26 4 62-18 78 20 8 26 12 26 14H126c-2-4 0-6 6 0Z" fill="#ff8c3a" stroke="#241d1a" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M118 470c-16-12-18-32-8-46 2 14 10 18 16 16-4-18 6-30 16-34-2 14 4 18 10 14 4 12 14 16 20 10 6 14 0 32-12 40" fill="#ffd166" stroke="none"/>
+
+  <!-- pan -->
+  <g stroke="#241d1a" stroke-width="8" stroke-linejoin="round" stroke-linecap="round">
+    <ellipse cx="196" cy="300" rx="86" ry="34" transform="rotate(-16 196 300)" fill="#6b5248"/>
+    <ellipse cx="196" cy="296" rx="66" ry="22" transform="rotate(-16 196 296)" fill="#8a6a5c"/>
+    <path d="M262 330l52 40" fill="none"/>
+  </g>
+
+  <!-- flying veggies -->
+  <g stroke="#241d1a" stroke-width="7" stroke-linecap="round">
+    <path d="M150 214l10-6" stroke="#7ac74f"/>
+    <path d="M184 196l12 2" stroke="#ff7d98"/>
+    <path d="M132 244l-2 12" stroke="#7ac74f"/>
+    <path d="M220 232l10 8" stroke="#7ac74f"/>
+    <path d="M246 248l10-6" stroke="#ff7d98"/>
+    <path d="M160 268l6 10" stroke="#ffb08a"/>
+  </g>
+
+  <!-- chef -->
+  <g fill="none" stroke="#241d1a" stroke-width="9" stroke-linejoin="round" stroke-linecap="round">
+    <!-- hat -->
+    <g fill="#fff">
+      <circle cx="390" cy="128" r="30"/>
+      <circle cx="434" cy="112" r="36"/>
+      <circle cx="478" cy="132" r="28"/>
+      <path d="M362 168c0-20 28-26 58-26s58 6 58 26z"/>
+    </g>
+    <!-- head -->
+    <circle cx="420" cy="238" r="76" fill="#fff"/>
+    <!-- eyes + smile -->
+    <g stroke-width="10">
+      <path d="M398 228v4"/>
+      <path d="M442 228v4"/>
+      <path d="M408 268c8 12 24 12 32 0"/>
+    </g>
+    <g fill="#ff9fb2" stroke="none" opacity=".55">
+      <ellipse cx="384" cy="252" rx="13" ry="8"/>
+      <ellipse cx="456" cy="252" rx="13" ry="8"/>
+    </g>
+    <!-- body / apron -->
+    <path fill="#f6845f" d="M348 340c22-20 50-30 72-30s50 10 72 30c14 14 20 60 20 96H328c0-36 6-82 20-96Z"/>
+    <path d="M392 316v42" fill="#f6845f"/>
+    <path d="M448 316v42" fill="#f6845f"/>
+    <path fill="none" d="M400 430h40"/>
+    <!-- arms -->
+    <path d="M352 356c-26 0-50-16-68-34" fill="none"/>
+    <path d="M490 350c22-4 42-12 54-26" fill="none"/>
+  </g>
+
+  <!-- plate with snack -->
+  <g stroke="#241d1a" stroke-width="8" stroke-linejoin="round">
+    <ellipse cx="516" cy="352" rx="46" ry="14" fill="#fff"/>
+    <path d="M500 330c0-14 12-24 26-24s26 10 26 24z" fill="#a9744f"/>
+  </g>
+</svg>

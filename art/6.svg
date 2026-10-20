@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="70 82 460 470" width="460" height="470" role="img" aria-label="Doodle bouquet of flowers with a ribbon">
+  <rect width="600" height="600" fill="#fff8f1"/>
+
+  <!-- stems -->
+  <g stroke="#4f7a4a" stroke-width="9" stroke-linecap="round" fill="none">
+    <path d="M300 400V196"/>
+    <path d="M300 400c-26-58-58-88-96-104"/>
+    <path d="M300 400c26-58 58-88 96-104"/>
+    <path d="M300 400c-8-48-6-82 4-112"/>
+  </g>
+
+  <!-- leaves -->
+  <g fill="#9ccc8b" stroke="#241d1a" stroke-width="7" stroke-linejoin="round">
+    <path d="M292 330c-30-6-48 8-52 26 22 10 44 4 52-26Z"/>
+    <path d="M308 312c28-8 46 4 52 22-22 12-44 8-52-22Z"/>
+  </g>
+
+  <!-- flowers -->
+  <g stroke="#241d1a" stroke-width="8" stroke-linejoin="round">
+    <g fill="#ff9fb2">
+      <circle cx="300" cy="170" r="42"/>
+      <circle cx="252" cy="196" r="40"/>
+      <circle cx="348" cy="196" r="40"/>
+      <circle cx="272" cy="238" r="38"/>
+      <circle cx="328" cy="238" r="38"/>
+    </g>
+    <circle cx="300" cy="208" r="30" fill="#ffe9a8"/>
+
+    <g fill="#ffd6de">
+      <circle cx="196" cy="272" r="34"/>
+      <circle cx="160" cy="292" r="30"/>
+      <circle cx="228" cy="292" r="30"/>
+    </g>
+    <circle cx="196" cy="294" r="24" fill="#ffb08a"/>
+
+    <g fill="#d9c6ff">
+      <circle cx="404" cy="272" r="34"/>
+      <circle cx="372" cy="292" r="30"/>
+      <circle cx="436" cy="292" r="30"/>
+    </g>
+    <circle cx="404" cy="294" r="24" fill="#ffe9a8"/>
+
+    <g fill="#ffe9a8">
+      <circle cx="304" cy="126" r="26"/>
+      <circle cx="278" cy="140" r="24"/>
+      <circle cx="330" cy="140" r="24"/>
+    </g>
+    <circle cx="304" cy="142" r="17" fill="#ffb08a"/>
+  </g>
+
+  <!-- wrapper + ribbon -->
+  <path d="M212 400h176l-26 106c-2 9-10 15-19 15H257c-9 0-17-6-19-15Z"
+        fill="#fffdfa" stroke="#241d1a" stroke-width="9" stroke-linejoin="round"/>
+  <path d="M212 400h176l-8 32H220Z" fill="#ffd6de" stroke="#241d1a" stroke-width="8" stroke-linejoin="round"/>
+  <g fill="#ff7d98" stroke="#241d1a" stroke-width="7" stroke-linejoin="round">
+    <path d="M300 432c-16-20-52-16-52 8 0 18 34 30 52 40 18-10 52-22 52-40 0-24-36-28-52-8Z"/>
+  </g>
+
+  <!-- sparkles -->
+  <g stroke="#ff7d98" stroke-width="6" stroke-linecap="round">
+    <path d="M104 160v24M92 172h24"/>
+    <path d="M498 150v24M486 162h24"/>
+    <path d="M470 400v22M459 411h22"/>
+  </g>
+</svg>
