@@ -48,7 +48,7 @@
       <figure class="frame anim" style="--d:520ms; --tilt:-3deg;">
         <span class="tape tape-l" aria-hidden="true"></span>
         <span class="tape tape-r" aria-hidden="true"></span>
-        <img class="photo" src="1.svg" alt="A blushing doodle face hiding behind its hands" data-fallback="1.jpg art/1.svg" />
+        <img class="photo" src="Assets/1.svg" alt="A doodle cat with a little heart and sparkle beside it" data-fallback="Assets/1.jpg" fetchpriority="high" />
         <figcaption>exhibit A: me, being charming</figcaption>
       </figure>
     </div>
@@ -71,7 +71,7 @@
       <figure class="frame anim" style="--d:420ms; --tilt:2.5deg;">
         <span class="tape tape-l" aria-hidden="true"></span>
         <span class="tape tape-r" aria-hidden="true"></span>
-        <img class="photo" src="2.svg" alt="A tiny doodle creature with big sparkly eyes and blushing cheeks" data-fallback="2.jpg art/2.svg" />
+        <img class="photo" src="Assets/2.svg" alt="A wide-eyed doodle creature with little pink wings" data-fallback="Assets/2.jpg" loading="lazy" decoding="async" />
         <figcaption>me, hearing that</figcaption>
       </figure>
     </div>
@@ -96,7 +96,7 @@
       </div>
 
       <figure class="frame small anim" style="--d:420ms; --tilt:3deg;">
-        <img class="photo" src="3.svg" alt="A doodle chef flipping a flaming pan" data-fallback="3.jpg art/3.svg" />
+        <img class="photo" src="Assets/Reason1.svg" alt="A doodle chef flipping a flaming pan" data-fallback="Assets/Reason1.jpg" loading="lazy" decoding="async" />
         <figcaption>3 am, chef mode: on</figcaption>
       </figure>
     </div>
@@ -121,7 +121,7 @@
       </div>
 
       <figure class="frame small anim" style="--d:420ms; --tilt:-3deg;">
-        <img class="photo" src="4.svg" alt="A doodle cat sweeping with a broom, saying wush wush" data-fallback="4.jpg art/4.svg" />
+        <img class="photo" src="Assets/Reason2.svg" alt="A doodle cat sweeping with a duster, saying wush wush" data-fallback="Assets/Reason2.jpg" loading="lazy" decoding="async" />
         <figcaption>wush wush (that's the sound of me helping)</figcaption>
       </figure>
     </div>
@@ -146,7 +146,7 @@
       </div>
 
       <figure class="frame small anim" style="--d:420ms; --tilt:2.5deg;">
-        <img class="photo" src="5.svg" alt="Doodle for reason three" data-fallback="5.jpg art/5.svg" />
+        <img class="photo" src="Assets/Reason3.svg" alt="A doodle figure holding a leash with a big red heart on the other end" data-fallback="Assets/Reason3.jpg" loading="lazy" decoding="async" />
         <figcaption>loyal, and a little dramatic about it</figcaption>
       </figure>
     </div>
@@ -171,7 +171,7 @@
       </div>
 
       <figure class="frame small anim" style="--d:420ms; --tilt:-2.5deg;">
-        <img class="photo" src="6.svg" alt="Doodle for reason four" data-fallback="6.jpg art/6.svg" />
+        <img class="photo" src="Assets/Reason4.svg" alt="A doodle cat holding an armful of roses" data-fallback="Assets/Reason4.jpg" loading="lazy" decoding="async" />
         <figcaption>a flower budget with no upper limit</figcaption>
       </figure>
     </div>
@@ -191,6 +191,11 @@
         So what do you say
       </h2>
 
+      <figure class="frame small anim" style="--d:360ms; --tilt:2deg;">
+        <img class="photo" src="Assets/YesOrNo.svg" alt="A doodle face with one brow raised, waiting for an answer" data-fallback="Assets/YesOrNo.jpg" loading="lazy" decoding="async" />
+        <figcaption>me, waiting, extremely calmly</figcaption>
+      </figure>
+
       <div class="answers anim" style="--d:460ms" role="group" aria-label="Your answer">
         <button type="button" class="answer answer-yes" data-answer="yes">Yes</button>
         <button type="button" class="answer answer-no" data-answer="no">No</button>
@@ -201,6 +206,25 @@
   </section>
 
 </main>
+
+<!-- the answer popup: one card, two states (yes / no) -->
+<div class="modal" id="answer-modal" hidden>
+  <div class="modal-backdrop" data-modal-close></div>
+
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-text">
+    <span class="tape tape-l" aria-hidden="true"></span>
+
+    <button type="button" class="modal-close" data-modal-close aria-label="Close this message">&times;</button>
+
+    <img class="modal-art" alt="" data-modal-art decoding="async" />
+
+    <p class="modal-text" id="modal-text" data-modal-text aria-live="polite"></p>
+
+    <div class="modal-actions" data-modal-actions>
+      <button type="button" class="answer answer-yes" data-modal-yes>Yes</button>
+    </div>
+  </div>
+</div>
 
 <script src="script.js" defer></script>
 </body>

@@ -10,17 +10,30 @@
   const dots = Array.from(document.querySelectorAll(".dots button"));
 
   /* ---------- image fallbacks ----------
-     N.svg -> N.jpg -> art/N.svg (a drawn stand-in), tried in order.
+     Assets/X.svg -> Assets/X.jpg -> an inline drawn heart, tried in order.
      This lives here rather than in an inline onerror so it also covers
      images that already failed before this file loaded. */
+
+  const PLACEHOLDER =
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E" +
+    "%3Crect width='120' height='120' fill='%23fffdfa'/%3E" +
+    "%3Cpath d='M60 92C44 81 30 70 30 56a16 16 0 0 1 30-7 16 16 0 0 1 30 7c0 14-14 25-30 36Z' " +
+    "fill='none' stroke='%23ff7d98' stroke-width='4' stroke-linejoin='round'/%3E%3C/svg%3E";
 
   Array.prototype.forEach.call(document.querySelectorAll(".photo"), function (img) {
     const chain = (img.getAttribute("data-fallback") || "").split(/\s+/).filter(Boolean);
     let next = 0;
+    let spent = false;
 
     function step() {
-      if (next >= chain.length) return;
-      img.src = chain[next++];
+      if (spent) return;
+      if (next < chain.length) {
+        img.src = chain[next++];
+        return;
+      }
+      spent = true;
+      img.src = PLACEHOLDER;
+      img.classList.add("is-missing");
     }
 
     img.addEventListener("error", step);
@@ -97,6 +110,9 @@
           burstDone = true;
           heartBurst(best);
         }
+        // the question is on screen: fetch the two popup drawings now, so the
+        // card opens with its picture already decoded
+        if (best.id === "page-7") warmPopupArt();
       }
     },
     { threshold: [0, 0.2, 0.35, 0.5, 0.75, 1] }
@@ -213,9 +229,17 @@
   const isDevHost = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) || /\.style\.dev$/.test(location.hostname);
   if (isDevHost && typeof fetch === "function") {
     let lastStamp = null;
-    window.setInterval(function () {
+    const timer = window.setInterval(function () {
       fetch("/__build", { cache: "no-store" })
-        .then(function (res) { return res.ok ? res.json() : null; })
+        .then(function (res) {
+          // a host that answers /__build with anything but 200 is not the dev
+          // server (a deployed build served from localhost, say): stop asking
+          if (!res.ok) {
+            window.clearInterval(timer);
+            return null;
+          }
+          return res.json();
+        })
         .then(function (data) {
           if (!data || typeof data.mtime !== "number") return;
           if (lastStamp !== null && data.mtime !== lastStamp) location.reload();
@@ -250,36 +274,205 @@
   /* ---------- the question at the end ---------- */
 
   const noteEl = document.querySelector("[data-note]");
-  const answerButtons = Array.from(document.querySelectorAll(".answer"));
+  const pageAnswers = Array.from(document.querySelectorAll(".answers .answer"));
+  const page7 = document.getElementById("page-7");
 
-  // a local mp3 dropped next to index.html always wins; otherwise the
-  // YouTube clip is played through a hidden 1px embed
-  const SOUND = {
-    yes: { id: "8SoovMIylmA", file: "popper.mp3" },
-    no: { id: "D32vImPoMZs", file: "cry.mp3" }
+  /* the popup card: one element, two states. "yes" shows Yes.svg, "no" shows
+     No.svg plus a Yes button that lands in exactly the same place the real
+     Yes button does. */
+
+  const modal = document.getElementById("answer-modal");
+  const modalArt = modal && modal.querySelector("[data-modal-art]");
+  const modalText = modal && modal.querySelector("[data-modal-text]");
+  const modalActions = modal && modal.querySelector("[data-modal-actions]");
+  const modalYes = modal && modal.querySelector("[data-modal-yes]");
+  const modalClose = modal && modal.querySelector(".modal-close");
+
+  const POPUP = {
+    yes: {
+      art: "Assets/Yes.svg",
+      alt: "A doodle couple hugging, both of them blushing",
+      text: "Oh I lovee youu too shuttumaniii nee enne choose cheythuloo\uD83E\uDD79\uD83E\uDD0D"
+    },
+    no: {
+      art: "Assets/No.svg",
+      alt: "A doodle cat glaring with big watery eyes",
+      text: "Yess click cheyy shuttuveeeyy\uD83D\uDD2A"
+    }
   };
 
-  answerButtons.forEach(function (button) {
-    button.addEventListener("click", function () {
-      const kind = button.dataset.answer;
+  const FOCUSABLE =
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
-      answerButtons.forEach(function (b) {
+  let modalOpen = false;
+  let lastFocus = null;
+  let hideTimer = 0;
+  let lockedScroll = 0;
+  let artsWarmed = false;
+
+  function warmPopupArt() {
+    if (artsWarmed) return;
+    artsWarmed = true;
+    // ~1 MB each: fetch them once the question is on screen, not at the click
+    Object.keys(POPUP).forEach(function (k) {
+      const pre = new Image();
+      pre.decoding = "async";
+      pre.src = POPUP[k].art;
+    });
+  }
+
+  function fillPopup(kind) {
+    const copy = POPUP[kind];
+    if (!copy || !modal) return;
+
+    modal.dataset.state = kind;
+    modalText.textContent = copy.text;
+    modalArt.alt = copy.alt;
+
+    if (modalArt.getAttribute("src") !== copy.art) {
+      modalArt.src = copy.art;
+    }
+
+    // the sad card is the only one that offers a way out
+    if (modalActions) modalActions.hidden = kind !== "no";
+  }
+
+  function openPopup(kind) {
+    if (!modal) return;
+
+    warmPopupArt();
+    window.clearTimeout(hideTimer);
+    fillPopup(kind);
+
+    if (!modalOpen) {
+      lastFocus = document.activeElement;
+      lockedScroll = window.scrollY || window.pageYOffset || 0;
+      modal.hidden = false;
+      modalOpen = true;
+      modal.setAttribute("aria-hidden", "false");
+      document.documentElement.classList.add("is-locked");
+      void modal.offsetWidth; // flush, so the entrance transition still runs
+    }
+
+    modal.classList.add("is-on");
+
+    const target = kind === "no" && modalYes ? modalYes : modalClose;
+    if (target) {
+      try {
+        target.focus({ preventScroll: true });
+      } catch (err) {
+        target.focus();
+      }
+    }
+  }
+
+  function closePopup() {
+    if (!modal || !modalOpen) return;
+
+    modalOpen = false;
+    // the clip belongs to the card: closing it ends the sound, so a long
+    // mp3 cannot keep playing after the message is gone
+    silence();
+    modal.classList.remove("is-on");
+    modal.setAttribute("aria-hidden", "true");
+
+    hideTimer = window.setTimeout(
+      function () {
+        modal.hidden = true;
+        modal.removeAttribute("data-state");
+        document.documentElement.classList.remove("is-locked");
+        // the snap points are unchanged, so this just undoes the scroll lock
+        window.scrollTo(0, lockedScroll);
+
+        if (lastFocus && typeof lastFocus.focus === "function") {
+          try {
+            lastFocus.focus({ preventScroll: true });
+          } catch (err) {
+            lastFocus.focus();
+          }
+        }
+      },
+      reducedMotion ? 0 : 420
+    );
+  }
+
+  if (modal) {
+    Array.prototype.forEach.call(modal.querySelectorAll("[data-modal-close]"), function (el) {
+      el.addEventListener("click", closePopup);
+    });
+
+    if (modalYes) {
+      modalYes.addEventListener("click", function () {
+        acceptYes();
+      });
+    }
+
+    document.addEventListener("keydown", function (event) {
+      if (!modalOpen) return;
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closePopup();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const items = Array.prototype.filter.call(
+        modal.querySelectorAll(FOCUSABLE),
+        function (el) {
+          return !el.hidden && el.offsetParent !== null;
+        }
+      );
+      if (!items.length) return;
+
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+
+      if (event.shiftKey && (active === first || !modal.contains(active))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (active === last || !modal.contains(active))) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+  }
+
+  pageAnswers.forEach(function (button) {
+    button.addEventListener("click", function () {
+      pageAnswers.forEach(function (b) {
         b.classList.toggle("is-picked", b === button);
       });
 
-      if (kind === "yes") {
-        celebrate();
-        const panel = document.getElementById("page-7");
-        if (panel) heartBurst(panel);
-        setNote("I knew it. Best decision you've made all week \u2665");
+      // both branches start with the sound: the clip has to begin on this
+      // very click, and everything it needs was fetched at page load
+      if (button.dataset.answer === "yes") {
+        acceptYes();
       } else {
-        cry();
-        setNote("\u2026okay. i'll be right here, watering the flowers with my tears");
+        decline();
       }
-
-      playSound(kind);
     });
   });
+
+  function acceptYes() {
+    silence("yes");
+    playSound("yes");
+    clearTears();
+    celebrate();
+    if (page7) heartBurst(page7);
+    setNote("I knew it. Best decision you've made all week \u2665");
+    openPopup("yes");
+  }
+
+  function decline() {
+    silence("no");
+    playSound("no");
+    cry();
+    setNote("\u2026okay. i'll be right here, watering the flowers with my tears");
+    openPopup("no");
+  }
 
   function setNote(text) {
     if (!noteEl) return;
@@ -373,12 +566,22 @@
 
   /* ---------- water works ---------- */
 
-  function cry() {
-    if (reducedMotion) return;
+  let cryTimer = 0;
 
+  // also used when the sad popup hands over to the happy one
+  function clearTears() {
+    window.clearTimeout(cryTimer);
+    cryTimer = 0;
+    document.body.classList.remove("is-crying");
     Array.prototype.forEach.call(document.querySelectorAll(".rain, .tears"), function (node) {
       node.remove();
     });
+  }
+
+  function cry() {
+    if (reducedMotion) return;
+
+    clearTears();
 
     const layer = document.createElement("div");
     layer.className = "rain";
@@ -411,7 +614,8 @@
       layer.appendChild(drop);
     }
 
-    window.setTimeout(function () {
+    cryTimer = window.setTimeout(function () {
+      cryTimer = 0;
       tint.classList.remove("is-on");
       document.body.classList.remove("is-crying");
       window.setTimeout(function () {
@@ -421,55 +625,118 @@
     }, 6400);
   }
 
-  /* ---------- sound effects ---------- */
+  /* ---------- sound effects ----------
+
+     The clip has to start on the click itself, so nothing may be fetched,
+     decoded or constructed at that moment. Both files are created with
+     preload="auto" the moment this script runs — long before the question is
+     reached — so a press only calls play().
+
+     Assets/Yes.mp3 and Assets/No.mp3 are the real clips. If one is ever
+     missing, the generated wav of the same mood (popper.wav / cry.wav) takes
+     over through the element's own error event, so there is no probe request
+     and nothing to wait for. */
+
+  const SOUND = {
+    yes: { file: "Assets/Yes.mp3", fallback: "popper.wav" },
+    no: { file: "Assets/No.mp3", fallback: "cry.wav" }
+  };
+
+  // el = the element that is already fetching + decoding this clip
+  Object.keys(SOUND).forEach(function (k) {
+    SOUND[k].el = null;
+    SOUND[k].touched = false;
+  });
+
+  function loadSound(cfg, src) {
+    const el = new Audio();
+    el.preload = "auto";
+    el.volume = 0.95;
+    el.addEventListener("error", function () {
+      // only the primary file may fall back; a broken wav is simply silent
+      if (src === cfg.file && cfg.fallback) loadSound(cfg, cfg.fallback);
+    });
+    el.src = src;
+    el.load();
+    cfg.el = el;
+    return el;
+  }
 
   function playSound(kind) {
     const cfg = SOUND[kind];
     if (!cfg) return;
 
-    // check for an mp3 next to index.html first, so dropping one in is enough
-    // to replace the YouTube clip; anything else falls through to the embed
-    function fallback() {
-      playFromYouTube(cfg.id);
+    cfg.touched = true;
+    const el = cfg.el || loadSound(cfg, cfg.file);
+
+    try {
+      el.currentTime = 0;
+      const started = el.play();
+      // a refused play() is not actionable here; the animation still runs
+      if (started && typeof started.catch === "function") {
+        started.catch(function () {});
+      }
+    } catch (err) {
+      /* no audio support: leave it silent */
     }
-
-    if (typeof fetch !== "function") {
-      fallback();
-      return;
-    }
-
-    let played = false;
-
-    fetch(cfg.file, { method: "HEAD", cache: "no-store" })
-      .then(function (res) {
-        if (!res.ok) throw new Error("no local file");
-        const audio = new Audio(cfg.file);
-        audio.volume = 0.9;
-        const started = audio.play();
-        if (!started) throw new Error("playback not supported");
-        return started.then(function () { played = true; });
-      })
-      .catch(function () {
-        if (!played) fallback();
-      });
   }
 
-  let youtubeFrame = null;
-
-  function playFromYouTube(id) {
-    if (youtubeFrame) youtubeFrame.remove();
-
-    const frame = document.createElement("iframe");
-    frame.className = "yt-sound";
-    frame.setAttribute("title", "sound effect");
-    frame.setAttribute("allow", "autoplay; encrypted-media; picture-in-picture");
-    frame.setAttribute("allowfullscreen", "");
-    frame.setAttribute("frameborder", "0");
-    frame.src =
-      "https://www.youtube.com/embed/" + id +
-      "?autoplay=1&controls=0&modestbranding=1&rel=0&playsinline=1&iv_load_policy=3";
-
-    document.body.appendChild(frame);
-    youtubeFrame = frame;
+  // stop everything except the one that is starting, so saying yes after no
+  // does not leave the sad clip playing under the happy one. Called with no
+  // argument, it stops both — which is what closing the popup does.
+  function silence(exceptKind) {
+    Object.keys(SOUND).forEach(function (k) {
+      if (k === exceptKind) return;
+      const el = SOUND[k].el;
+      if (!el) return;
+      SOUND[k].touched = true;
+      try {
+        el.pause();
+        el.currentTime = 0;
+      } catch (err) {}
+    });
   }
+
+  // the first tap anywhere unlocks audio (iOS) and finishes decoding, so the
+  // button press itself has nothing left to wait for
+  function warmUpAudio() {
+    document.removeEventListener("pointerdown", warmUpAudio, true);
+
+    Object.keys(SOUND).forEach(function (k) {
+      const cfg = SOUND[k];
+      const el = cfg.el;
+      if (!el) return;
+
+      function settle() {
+        // a real press landed while this was starting: leave it alone
+        if (cfg.touched) return;
+        try {
+          el.pause();
+          el.currentTime = 0;
+        } catch (err) {}
+        el.muted = false;
+      }
+
+      try {
+        el.muted = true;
+        const started = el.play();
+        if (started && typeof started.then === "function") {
+          started.then(settle).catch(function () {
+            el.muted = false;
+          });
+        } else {
+          settle();
+        }
+      } catch (err) {
+        el.muted = false;
+      }
+    });
+  }
+
+  // start immediately: these are the two files the whole last page depends on
+  Object.keys(SOUND).forEach(function (k) {
+    loadSound(SOUND[k], SOUND[k].file);
+  });
+
+  document.addEventListener("pointerdown", warmUpAudio, true);
 })();

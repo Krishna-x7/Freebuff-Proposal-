@@ -2,21 +2,24 @@
 
 A tiny one-page scroll story. No build step, no dependencies — just open `index.html`.
 
-## Put your doodles in
+## The drawings
 
-Each screen tries three files in order, so any one of them works:
+Every screen uses the doodle from `Assets/` that the request named:
 
-| screen                                | 1st       | 2nd       | 3rd (built-in) |
-| ------------------------------------- | --------- | --------- | -------------- |
-| first screen                          | `1.svg`   | `1.jpg`   | `art/1.svg`    |
-| "oh so you're interested" screen      | `2.svg`   | `2.jpg`   | `art/2.svg`    |
-| reason 1 (the 3 am cooking one)       | `3.svg`   | `3.jpg`   | `art/3.svg`    |
-| reason 2 (the cleaning one)           | `4.svg`   | `4.jpg`   | `art/4.svg`    |
-| reason 3 (the never-cheat one)        | `5.svg`   | `5.jpg`   | `art/5.svg`    |
-| reason 4 (the unlimited flowers one)  | `6.svg`   | `6.jpg`   | `art/6.svg`    |
+| screen                                 | file                   |
+| -------------------------------------- | ---------------------- |
+| first screen                           | `Assets/1.svg`         |
+| "oh so you're interested" screen       | `Assets/2.svg`         |
+| Reason.1 (the 3 am cooking one)        | `Assets/Reason1.svg`   |
+| Reason.2 (the cleaning one)            | `Assets/Reason2.svg`   |
+| Reason.3 (the never-cheat one)         | `Assets/Reason3.svg`   |
+| Reason.4 (the unlimited flowers one)   | `Assets/Reason4.svg`   |
+| the question ("So what do you say")    | `Assets/YesOrNo.svg`   |
+| the popup after **Yes**                | `Assets/Yes.svg`       |
+| the popup after **No**                 | `Assets/No.svg`        |
 
-Put any of those in the project root and it is picked up automatically — no code changes.
-Until a file exists, the hand-drawn `art/N.svg` stand-in is shown, so the page never looks broken.
+Each `<img>` also carries a `data-fallback`: if an SVG is ever missing, the same name as a
+`.jpg` is tried, and after that an inline drawn heart, so a screen never shows a broken icon.
 
 ## Previewing locally
 
@@ -30,38 +33,87 @@ current files, and it exposes `/__build` so an open preview reloads itself when 
 
 ## Files
 
-- `index.html` — the seven screens and their copy
-- `styles.css` — paper-and-doodle look, scroll snapping, reveal animations
-- `script.js` — word-by-word reveals, parallax cards, page dots, heart burst
-- `art/` — fallback doodles
+- `index.html` — the seven screens, their copy, and the answer popup
+- `styles.css` — paper-and-doodle look, scroll snapping, reveal animations, the popup card
+- `script.js` — word-by-word reveals, parallax cards, page dots, the popup, sound
+- `Assets/` — the doodles and the two clips
+- `popper.wav` / `cry.wav` — generated stand-ins, used only if an mp3 is missing
+- `tools/make-sounds.py` — regenerates those two (standard library only)
 - `serve.py` — no-cache dev server with live reload
+- `worker/index.js` — the Worker entrypoint the hosted build runs
+- `sites.manifest.json` — what gets uploaded, and from where
+- `tools/pack-site.sh` — builds `dist/` (generated, git-ignored) for a deploy
 
 ## The final question
 
-The last screen asks "So what do you say" with **Yes** / **No** buttons.
+The last screen asks "So what do you say" with **Yes** / **No** buttons, over the
+`YesOrNo.svg` face. Each answer opens a popup card:
 
-- **Yes** — confetti poppers fire from both corners, hearts float up, and the page says something smug.
-- **No** — rain runs down the screen and the page goes a bit grey and wet-looking.
+| answer | the card shows                      | it plays            |
+| ------ | ----------------------------------- | ------------------- |
+| **Yes** | `Assets/Yes.svg` + "Oh I lovee youu too shuttumaniii nee enne choose cheythuloo🥹🤍" | `Assets/Yes.mp3` |
+| **No**  | `Assets/No.svg` + "Yess click cheyy shuttuveeeyy🔪"           | `Assets/No.mp3`  |
 
-Both effects replay if you click again. The click can only play sound once it has happened,
-which is why it is wired to the buttons and not on scroll.
+Behind the cards the old effects still run: confetti poppers and floating hearts for **Yes**,
+rain and a cold grey tint for **No**.
+
+The **No** card also carries a **Yes** button. Pressing it does exactly what the real Yes
+button does — it stops the sad clip, clears the tears, fires the confetti, plays
+`Assets/Yes.mp3` and swaps the card over to `Yes.svg` and its line. So declining is never final.
+
+The popup closes with the **×**, the backdrop, or `Esc`; focus moves into the card and is
+returned to the button that opened it, and the page behind it stops scrolling while it is open.
+Closing it also **stops the clip** and rewinds it to the start, so a long song cannot keep
+playing behind a message that is gone. Opening it again starts the sound from the top.
 
 ### Sound effects
 
-Each choice tries two sources, in this order:
+The sound has to play on the click itself, so it is a local file and never a stream:
+`Assets/Yes.mp3` and `Assets/No.mp3`.
 
-1. `popper.mp3` (Yes) or `cry.mp3` (No) next to `index.html` — drop one in and it is used.
-2. Otherwise the YouTube clip is embedded in a hidden 1px iframe and autoplayed:
-   - Yes: <https://youtu.be/8SoovMIylmA>
-   - No: <https://youtube.com/shorts/D32vImPoMZs>
+#### Why it starts instantly
 
-The YouTube route needs an internet connection, and a browser with a strict autoplay policy
-may still refuse it. If the sound does not play, save the audio as `popper.mp3` / `cry.mp3`
-in this folder — that always works, including offline.
+Everything is prepared at page load, so a click has nothing left to wait for:
+
+- both clips are created as `<audio preload="auto">` elements the moment `script.js` runs,
+  so they are fetched and decoded while the visitor is still scrolling, and a press is just
+  `play()` — no request, no decode, no element construction
+- the first `pointerdown` anywhere warms both files up (muted play, then reset). That is what
+  unlocks audio on iOS Safari, and it finishes decoding early too
+- `playSound()` is the first thing the click handler does, before the canvas and the 50-odd
+  tear drops are built, so DOM work cannot sit in front of the sound
+- if an mp3 is ever missing, the element's own `error` event swaps in `popper.wav` / `cry.wav`,
+  which are generated by `python3 tools/make-sounds.py` using nothing but the standard library
+- the two popup drawings are fetched once the question scrolls into view, so the card opens
+  with its picture already decoded
+
+Measured in headless Chromium: **click → audible playback ≈ 65 ms**, against the second or
+two of dead air that a YouTube embed cost.
+
+**Why the YouTube links are not used.** <https://youtu.be/8SoovMIylmA> and
+<https://youtube.com/shorts/D32vImPoMZs> are the right sounds, but an embed cannot start on
+the click that asks for it: the browser must load youtube.com's player and buffer the clip
+first, which is exactly the delay that made the buttons feel broken. A local file starts in
+milliseconds.
+
+## Publishing
+
+The site is hosted on Freebuff Sites as a static Worker: `worker/index.js` does nothing but
+`return env.ASSETS.fetch(request)`, and `sites.manifest.json` points at it plus the `dist/`
+folder that `tools/pack-site.sh` assembles.
+
+```bash
+./tools/pack-site.sh      # index.html, styles.css, script.js, Assets/, popper.wav, cry.wav -> dist/
+npx wrangler dev --local  # run the exact uploaded build on workerd before shipping it
+```
+
+Only what the page serves is uploaded (about 6.6 MB, 16 files) — not `serve.py`, `tools/`,
+the README or the screenshots. The deployed build is
+<https://site-c9173a0c301941dd951219d126c18e4d.freebuff.page>.
 
 ## Notes
 
 - Scroll snapping is on, so each screen locks into place.
 - Arrow keys / PageUp / PageDown also move between screens; the dots on the right jump anywhere.
-- `prefers-reduced-motion` turns the effects and animations off (the notes still appear).
+- `prefers-reduced-motion` turns the effects and animations off (the notes and popups still appear).
 - Display font is Gaegu from Google Fonts, with a handwriting fallback if it can't load.

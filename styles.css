@@ -527,6 +527,137 @@ main { position: relative; z-index: 2; }
 }
 .answer-note.is-on { opacity: 1; transform: none; }
 
+/* the question panel carries one more card than the rest, so it sits a
+   little smaller to stay inside 100svh without clipping */
+.finale { padding-bottom: clamp(24px, 6vh, 64px); }
+.finale .frame { --frame-w: min(23svh, 220px); }
+.finale .content { gap: clamp(12px, 2.2vh, 24px); }
+.finale .headline { font-size: clamp(1.9rem, min(5.4vw, 7.5vh), 4.2rem); }
+
+/* ---------------------------------------------------------------
+   The answer popup
+   --------------------------------------------------------------- */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 4vw, 40px);
+}
+/* the [hidden] attribute has to beat `display: grid` above */
+.modal[hidden] { display: none; }
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(43, 35, 32, 0.32);
+  -webkit-backdrop-filter: blur(7px) saturate(1.05);
+  backdrop-filter: blur(7px) saturate(1.05);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.modal.is-on .modal-backdrop { opacity: 1; }
+
+.modal-card {
+  position: relative;
+  width: min(420px, 88vw);
+  max-height: min(86svh, 720px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 2.4vh, 20px);
+  padding: clamp(16px, 4vw, 24px) clamp(16px, 4vw, 24px) clamp(20px, 4vw, 26px);
+  text-align: center;
+  background: #fffdfa;
+  border-radius: 22px;
+  box-shadow:
+    0 40px 80px -32px rgba(43, 35, 32, 0.6),
+    0 4px 0 rgba(43, 35, 32, 0.05),
+    inset 0 0 0 1px rgba(43, 35, 32, 0.07);
+  opacity: 0;
+  transform: translate3d(0, 30px, 0) scale(0.9) rotate(-1.6deg);
+  transition:
+    opacity 0.32s ease,
+    transform 0.6s var(--ease-out);
+}
+.modal.is-on .modal-card {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1) rotate(-0.6deg);
+}
+
+/* one tape on the left leaves the top-right corner free for the close button */
+.modal-card .tape { top: -11px; width: 74px; height: 24px; }
+.modal-card .tape-l { left: -16px; }
+
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-body);
+  font-size: 1.35rem;
+  line-height: 1;
+  color: var(--ink-soft);
+  background: rgba(255, 248, 241, 0.9);
+  border: 1.5px solid rgba(43, 35, 32, 0.12);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.25s var(--ease-out), color 0.25s ease, border-color 0.25s ease;
+}
+.modal-close:hover { transform: scale(1.08) rotate(6deg); color: var(--ink); border-color: rgba(43, 35, 32, 0.3); }
+.modal-close:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
+
+.modal-art {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(43, 35, 32, 0.07);
+}
+
+.modal-text {
+  margin: 0;
+  max-width: 22ch;
+  font-family: var(--font-hand);
+  font-size: clamp(1.2rem, min(4.4vw, 3.4vh), 1.6rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+.modal-actions[hidden] { display: none; }
+.modal-actions .answer {
+  font-size: clamp(1.15rem, min(3vw, 3.4vh), 1.5rem);
+  padding: 0.5em 1.6em;
+}
+
+/* the sad card leans the other way, matching the tears behind it */
+.modal[data-state="no"] .modal-card { transform: translate3d(0, 30px, 0) scale(0.9) rotate(1.4deg); }
+.modal[data-state="no"].is-on .modal-card { transform: translate3d(0, 0, 0) scale(1) rotate(0.8deg); }
+
+/* while the popup is open the page behind must not scroll */
+html.is-locked,
+html.is-locked body { overflow: hidden; }
+
 /* ---------------------------------------------------------------
    Responsive
    --------------------------------------------------------------- */
@@ -649,18 +780,6 @@ body.is-crying main { filter: saturate(0.72) blur(0.4px); }
 body.is-crying { transition: filter 1.2s ease; }
 
 /* sound-effect iframes are kept invisible but in the layout so browsers still play them */
-.yt-sound {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 1px;
-  height: 1px;
-  border: 0;
-  opacity: 0.01;
-  pointer-events: none;
-  z-index: -1;
-}
-
 /* ---------------------------------------------------------------
    Reduced motion
    --------------------------------------------------------------- */
