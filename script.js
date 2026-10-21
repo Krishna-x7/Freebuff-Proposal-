@@ -459,8 +459,6 @@
   function acceptYes() {
     silence("yes");
     playSound("yes");
-    clearTears();
-    celebrate();
     if (page7) heartBurst(page7);
     setNote("I knew it. Best decision you've made all week \u2665");
     openPopup("yes");
@@ -469,7 +467,6 @@
   function decline() {
     silence("no");
     playSound("no");
-    cry();
     setNote("\u2026okay. i'll be right here, watering the flowers with my tears");
     openPopup("no");
   }
@@ -478,151 +475,6 @@
     if (!noteEl) return;
     noteEl.textContent = text;
     noteEl.classList.add("is-on");
-  }
-
-  /* ---------- popper ---------- */
-
-  function celebrate() {
-    if (reducedMotion) return;
-
-    const canvas = document.createElement("canvas");
-    canvas.className = "confetti-canvas";
-    canvas.setAttribute("aria-hidden", "true");
-    document.body.appendChild(canvas);
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) { canvas.remove(); return; }
-
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-
-    canvas.width = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
-    canvas.style.width = w + "px";
-    canvas.style.height = h + "px";
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    const colors = ["#ff7d98", "#ffb08a", "#ffe9a8", "#fffdfa", "#ff5f7e", "#bfe3ff"];
-    const pieces = [];
-
-    function popper(x, y, angle, count, power) {
-      for (let i = 0; i < count; i++) {
-        const spread = (Math.random() - 0.5) * 0.9;
-        const speed = power * (0.5 + Math.random() * 0.8);
-        pieces.push({
-          x: x,
-          y: y,
-          vx: Math.cos(angle + spread) * speed,
-          vy: Math.sin(angle + spread) * speed,
-          w: 5 + Math.random() * 7,
-          h: 8 + Math.random() * 11,
-          rot: Math.random() * Math.PI,
-          vr: (Math.random() - 0.5) * 0.42,
-          color: colors[Math.floor(Math.random() * colors.length)]
-        });
-      }
-    }
-
-    popper(w * 0.05, h + 12, -Math.PI / 2.9, 70, 19);
-    popper(w * 0.95, h + 12, -Math.PI + Math.PI / 2.9, 70, 19);
-    popper(w * 0.5, h * 0.6, -Math.PI / 2, 55, 13);
-
-    const started = performance.now();
-
-    function frame(now) {
-      ctx.clearRect(0, 0, w, h);
-      let alive = 0;
-
-      for (let i = 0; i < pieces.length; i++) {
-        const p = pieces[i];
-        p.vy += 0.32;
-        p.vx *= 0.994;
-        p.vy *= 0.994;
-        p.x += p.vx;
-        p.y += p.vy;
-        p.rot += p.vr;
-        if (p.y > h + 70) continue;
-        alive++;
-
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
-        ctx.globalAlpha = 0.95;
-        ctx.fillStyle = p.color;
-        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, Math.max(1.5, p.h * Math.abs(Math.cos(p.rot * 1.7))));
-        ctx.restore();
-      }
-
-      if (alive > 0 && now - started < 7000) {
-        window.requestAnimationFrame(frame);
-      } else {
-        canvas.remove();
-      }
-    }
-
-    window.requestAnimationFrame(frame);
-  }
-
-  /* ---------- water works ---------- */
-
-  let cryTimer = 0;
-
-  // also used when the sad popup hands over to the happy one
-  function clearTears() {
-    window.clearTimeout(cryTimer);
-    cryTimer = 0;
-    document.body.classList.remove("is-crying");
-    Array.prototype.forEach.call(document.querySelectorAll(".rain, .tears"), function (node) {
-      node.remove();
-    });
-  }
-
-  function cry() {
-    if (reducedMotion) return;
-
-    clearTears();
-
-    const layer = document.createElement("div");
-    layer.className = "rain";
-    layer.setAttribute("aria-hidden", "true");
-
-    const tint = document.createElement("div");
-    tint.className = "tears";
-    tint.setAttribute("aria-hidden", "true");
-
-    document.body.appendChild(tint);
-    document.body.appendChild(layer);
-    document.body.classList.add("is-crying");
-    window.requestAnimationFrame(function () { tint.classList.add("is-on"); });
-
-    const count = window.innerWidth < 640 ? 30 : 56;
-
-    for (let i = 0; i < count; i++) {
-      const bead = Math.random() < 0.34;
-      const drop = document.createElement("span");
-      drop.className = "drop" + (bead ? " is-bead" : "");
-      drop.style.left = (Math.random() * 100).toFixed(2) + "%";
-      drop.style.height = (bead ? 7 : 40 + Math.random() * 90).toFixed(0) + "px";
-      drop.style.setProperty("--drift", (Math.random() * 18 - 9).toFixed(0) + "px");
-      drop.style.width = (2 + Math.random() * 2.4).toFixed(1) + "px";
-      drop.style.opacity = (0.4 + Math.random() * 0.55).toFixed(2);
-      drop.style.animationDuration = (bead ? 1.6 + Math.random() * 1.6 : 1.25 + Math.random() * 1.5).toFixed(2) + "s";
-      // a negative delay drops each one in mid-fall, so the screen is
-      // already covered in tears the instant the button is pressed
-      drop.style.animationDelay = "-" + (Math.random() * 2.4).toFixed(2) + "s";
-      layer.appendChild(drop);
-    }
-
-    cryTimer = window.setTimeout(function () {
-      cryTimer = 0;
-      tint.classList.remove("is-on");
-      document.body.classList.remove("is-crying");
-      window.setTimeout(function () {
-        layer.remove();
-        tint.remove();
-      }, 1400);
-    }, 6400);
   }
 
   /* ---------- sound effects ----------

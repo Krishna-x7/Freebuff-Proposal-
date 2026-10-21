@@ -54,11 +54,12 @@ The last screen asks "So what do you say" with **Yes** / **No** buttons, over th
 | **Yes** | `Assets/Yes.svg` + "Oh I lovee youu too shuttumaniii nee enne choose cheythuloo🥹🤍" | `Assets/Yes.mp3` |
 | **No**  | `Assets/No.svg` + "Yess click cheyy shuttuveeeyy🔪"           | `Assets/No.mp3`  |
 
-Behind the cards the old effects still run: confetti poppers and floating hearts for **Yes**,
-rain and a cold grey tint for **No**.
+A handful of hearts still float up behind the **Yes** card. There is no canvas confetti and no
+rain overlay any more: both drew something new on every frame for several seconds, and that
+per-frame work was what made the answer feel laggy on a phone.
 
 The **No** card also carries a **Yes** button. Pressing it does exactly what the real Yes
-button does — it stops the sad clip, clears the tears, fires the confetti, plays
+button does — it stops the sad clip, floats the hearts, plays
 `Assets/Yes.mp3` and swaps the card over to `Yes.svg` and its line. So declining is never final.
 
 The popup closes with the **×**, the backdrop, or `Esc`; focus moves into the card and is
